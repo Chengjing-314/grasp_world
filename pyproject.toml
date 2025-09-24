@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling>=1.10"]
+build-backend = "hatchling.build"
+
+[project]
+name = "grasp-world"
+version = "0.1.0"
+description = "Utilities and experiments for grasp-world research."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Chengjing" }]
+dependencies = []
+
+[tool.hatch.build]
+include = ["grasp_world/**/*", "README.md", "pyproject.toml"]
+exclude = ["assets", "playground", "**/__pycache__"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["grasp_world"]
+
+[tool.hatch.build.targets.editable]
+packages = ["grasp_world"]

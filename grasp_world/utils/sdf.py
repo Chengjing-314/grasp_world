@@ -170,29 +170,31 @@ def sample_mesh_sdfs_on_axis(
 
 
 def blend_signed_distance_fields(
-    volume_a: torch.Tensor,
-    volume_b: torch.Tensor,
+    A: torch.Tensor,
+    B: torch.Tensor,
     weight: float,
     mode: str = "lsb",
     smoothness: float = 4.0,
 ) -> torch.Tensor:
-    """Blend two SDF volumes via linear interpolation or smooth min interpolation."""
-
-    if volume_a.shape != volume_b.shape:
+    if A.shape != B.shape:
         raise ValueError("Input volumes must share the same shape for blending.")
 
-    w = float(weight)
+    w = torch.as_tensor(weight, dtype=A.dtype, device=A.device).clamp(0.0, 1.0)
 
-    if mode == "lsb":  # Linear scalar blending
-        return (1.0 - w) * volume_a + w * volume_b
+    if mode == "lsb":
+        return (1.0 - w) * A + w * B
 
     if mode == "r":
-        k = max(smoothness, 1e-5)
-        blended_a = (1.0 - w) * volume_a
-        blended_b = w * volume_b
-        return -(1.0 / k) * torch.log(torch.exp(-k * blended_a) + torch.exp(-k * blended_b))
+        k = max(float(smoothness), 1e-5)
+        # log-weights to stay stable (avoid log(0))
+        logw0 = torch.log(torch.clamp(1.0 - w, min=1e-12))
+        logw1 = torch.log(torch.clamp(w, min=1e-12))
+        u = logw0 - k * A
+        v = logw1 - k * B
+        # log( (1-w) e^{-kA} + w e^{-kB} )  computed stably
+        return -torch.logaddexp(u, v) / k
 
-    raise ValueError(f"Unknown blend mode '{mode}'. Use 'lsb' or 'r'.")
+    raise ValueError("Unknown blend mode. Use 'lsb' or 'r'.")
 
 
 def ensure_valid_sdf(volume: np.ndarray | torch.Tensor, level: float = 0.0) -> float:

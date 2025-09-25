@@ -21,6 +21,7 @@ The current development environment was inspected with:
    ```bash
    conda create -n grasp_world python=3.10
    conda activate grasp_world
+   conda install pip
    pip install --upgrade pip
    ```
 

@@ -16,7 +16,7 @@ from grasp_world.utils.sdf import (
     compute_common_axis,
 )
 
-MESH_DIR = Path("assets/primitive_shapes")
+MESH_DIR = Path("assets/objects/primitive_shapes")
 MESHES: Dict[str, Path] = {
     "sphere": MESH_DIR / "sphere.obj",
     "cube": MESH_DIR / "cube.obj",
@@ -155,7 +155,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--smoothness",
         type=float,
-        default=4.0,
+        default=0.1,
         help="Smoothness parameter when --mode=r is selected.",
     )
 

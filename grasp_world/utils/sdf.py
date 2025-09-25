@@ -1,7 +1,8 @@
-"""Signed distance utilities powered by Kaolin."""
+"""Signed-distance utilities and mesh blending helpers."""
 
 from functools import lru_cache
-from typing import Dict, Tuple
+from pathlib import Path
+from typing import Dict, Iterable, Mapping, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -9,20 +10,14 @@ from kaolin.io import obj
 from kaolin.metrics.trianglemesh import point_to_mesh_distance
 from kaolin.ops.mesh import check_sign, index_vertices_by_faces
 import trimesh
+from skimage import measure
+
+from grasp_world.utils.torch_utils import resolve_device
 
 _DEFAULT_CHUNK_SIZE = 200_000
 
 
-def _resolve_device(device: torch.device | str | None) -> torch.device:
-    """Pick a torch.device, defaulting to CUDA when available."""
-    if isinstance(device, torch.device):
-        return device
-    if device in (None, "auto"):
-        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    return torch.device(device)
-
-
-def _load_mesh_components(mesh_path: str, device: torch.device) -> Dict[str, torch.Tensor]:
+def load_mesh_components(mesh_path: str, device: torch.device) -> Dict[str, torch.Tensor]:
     """Load mesh data needed for SDF queries and move tensors to `device`."""
     mesh = obj.import_mesh(mesh_path, triangulate=True).to_batched()
     verts_cpu = mesh.vertices.to(dtype=torch.float32)
@@ -42,13 +37,12 @@ def _load_mesh_components(mesh_path: str, device: torch.device) -> Dict[str, tor
     }
 
 
-def _signed_distance(
+def signed_distance(
     verts: torch.Tensor,
     faces: torch.Tensor,
     face_vertices: torch.Tensor,
     points: torch.Tensor,
 ) -> torch.Tensor:
-    """Evaluate the signed distance for a batch of query points on `verts` mesh."""
     with torch.no_grad():
         dist2, _, _ = point_to_mesh_distance(points.unsqueeze(0), face_vertices)
         sdf = torch.sqrt(dist2.squeeze(0))
@@ -57,12 +51,12 @@ def _signed_distance(
     return sdf
 
 
-def _evaluate_on_points(
+def sample_signed_distance(
     mesh_data: Dict[str, torch.Tensor],
     points: torch.Tensor,
     chunk_size: int,
 ) -> torch.Tensor:
-    """Chunked signed-distance evaluation to limit memory usage."""
+    """Sample signed distances for many points using chunked evaluation."""
     num_points = points.shape[0]
     sdf = torch.empty(num_points, dtype=mesh_data["verts"].dtype)
     device = mesh_data["verts"].device
@@ -70,7 +64,7 @@ def _evaluate_on_points(
     for start in range(0, num_points, chunk_size):
         end = min(start + chunk_size, num_points)
         chunk = points[start:end].to(device)
-        sdf_chunk = _signed_distance(
+        sdf_chunk = signed_distance(
             mesh_data["verts"], mesh_data["faces"], mesh_data["face_vertices"], chunk
         )
         sdf[start:end] = sdf_chunk.detach().cpu()
@@ -79,14 +73,12 @@ def _evaluate_on_points(
 
 
 @lru_cache(maxsize=8)
-def _load_trimesh(mesh_path: str) -> trimesh.Trimesh:
-    """Load a trimesh mesh with caching for CPU evaluation."""
+def load_trimesh(mesh_path: str) -> trimesh.Trimesh:
     return trimesh.load(mesh_path, process=False, force="mesh")
 
 
-def _signed_distance_trimesh(mesh_path: str, points: torch.Tensor) -> torch.Tensor:
-    """Compute signed distance using trimesh for CPU-only environments."""
-    mesh = _load_trimesh(mesh_path)
+def signed_distance_trimesh(mesh_path: str, points: torch.Tensor) -> torch.Tensor:
+    mesh = load_trimesh(mesh_path)
     pts = points.detach().cpu().numpy()
     sdf = mesh.nearest.signed_distance(pts)
     return torch.from_numpy(np.asarray(sdf, dtype=np.float32))
@@ -98,16 +90,16 @@ def mesh_sdf(
     device: torch.device | str | None = "auto",
     chunk_size: int = _DEFAULT_CHUNK_SIZE,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
-    device = _resolve_device(device)
-    mesh_data = _load_mesh_components(mesh_path, device)
+    device = resolve_device(device)
+    mesh_data = load_mesh_components(mesh_path, device)
     bb_min, bb_max = mesh_data["bounds"]
     grid_axes = [torch.linspace(float(bb_min[i]), float(bb_max[i]), grid_res) for i in range(3)]
     grid = torch.stack(torch.meshgrid(*grid_axes, indexing="ij"), dim=-1)
     flat_points = grid.reshape(-1, 3)
     if device.type == "cpu":
-        sdf_flat = _signed_distance_trimesh(mesh_path, flat_points)
+        sdf_flat = signed_distance_trimesh(mesh_path, flat_points)
     else:
-        sdf_flat = _evaluate_on_points(mesh_data, flat_points, chunk_size)
+        sdf_flat = sample_signed_distance(mesh_data, flat_points, chunk_size)
     return flat_points, sdf_flat.view(grid_res, grid_res, grid_res)
 
 
@@ -120,12 +112,133 @@ def mesh_sdf_from_points(
     if points.shape[-1] != 3:
         raise ValueError("Query points must have last dimension of size 3.")
 
-    device = _resolve_device(device)
+    device = resolve_device(device)
     if device.type == "cpu":
-        sdf_flat = _signed_distance_trimesh(mesh_path, points.reshape(-1, 3))
+        sdf_flat = signed_distance_trimesh(mesh_path, points.reshape(-1, 3))
         return sdf_flat.view(points.shape[:-1])
 
-    mesh_data = _load_mesh_components(mesh_path, device)
+    mesh_data = load_mesh_components(mesh_path, device)
     flattened = points.reshape(-1, 3).to(dtype=torch.float32).cpu()
-    sdf_flat = _evaluate_on_points(mesh_data, flattened, chunk_size)
+    sdf_flat = sample_signed_distance(mesh_data, flattened, chunk_size)
     return sdf_flat.view(points.shape[:-1])
+
+
+def compute_common_axis(
+    mesh_paths: Sequence[str | Path],
+    resolution: int,
+    margin: float = 0.15,
+) -> torch.Tensor:
+    """Return a shared coordinate axis covering all meshes with optional margin."""
+
+    mins = []
+    maxs = []
+    for mesh_path in mesh_paths:
+        mesh = obj.import_mesh(str(mesh_path), triangulate=True)
+        verts = mesh.vertices
+        mins.append(verts.min(dim=0).values)
+        maxs.append(verts.max(dim=0).values)
+
+    global_min = torch.stack(mins).min(dim=0).values
+    global_max = torch.stack(maxs).max(dim=0).values
+    lo = float(global_min.min())
+    hi = float(global_max.max())
+    span = hi - lo
+    lo -= margin * span
+    hi += margin * span
+    return torch.linspace(lo, hi, resolution)
+
+
+def sample_mesh_sdfs_on_axis(
+    meshes: Mapping[str, str | Path],
+    axis: torch.Tensor,
+    device: torch.device | str | None = "auto",
+    chunk_size: int = _DEFAULT_CHUNK_SIZE,
+) -> Dict[str, torch.Tensor]:
+    """Sample SDF volumes for multiple meshes on the provided axis-aligned grid."""
+
+    grid = torch.stack(torch.meshgrid(axis, axis, axis, indexing="ij"), dim=-1)
+    flat_points = grid.reshape(-1, 3)
+    volumes: Dict[str, torch.Tensor] = {}
+
+    for name, mesh_path in meshes.items():
+        volume = mesh_sdf_from_points(
+            str(Path(mesh_path)), flat_points, device=device, chunk_size=chunk_size
+        )
+        volumes[name] = volume.view(len(axis), len(axis), len(axis))
+
+    return volumes
+
+
+def blend_signed_distance_fields(
+    volume_a: torch.Tensor,
+    volume_b: torch.Tensor,
+    weight: float,
+    mode: str = "lsb",
+    smoothness: float = 4.0,
+) -> torch.Tensor:
+    """Blend two SDF volumes via linear interpolation or smooth min interpolation."""
+
+    if volume_a.shape != volume_b.shape:
+        raise ValueError("Input volumes must share the same shape for blending.")
+
+    w = float(weight)
+
+    if mode == "lsb":  # Linear scalar blending
+        return (1.0 - w) * volume_a + w * volume_b
+
+    if mode == "r":
+        k = max(smoothness, 1e-5)
+        blended_a = (1.0 - w) * volume_a
+        blended_b = w * volume_b
+        return -(1.0 / k) * torch.log(torch.exp(-k * blended_a) + torch.exp(-k * blended_b))
+
+    raise ValueError(f"Unknown blend mode '{mode}'. Use 'lsb' or 'r'.")
+
+
+def ensure_valid_sdf(volume: np.ndarray | torch.Tensor, level: float = 0.0) -> float:
+    """Check if iso-level exists, otherwise shift."""
+    vmin, vmax = volume.min(), volume.max()
+    if not (vmin <= level <= vmax):
+        level = 0.5 * (vmin + vmax)
+    return level
+
+
+def generate_blend_sequence(
+    volume_a: torch.Tensor,
+    volume_b: torch.Tensor,
+    steps: int,
+    mode: str = "lsb",
+    smoothness: float = 4.0,
+) -> Iterable[Tuple[float, torch.Tensor]]:
+    """Yield (weight, blended_volume) pairs across the requested number of steps."""
+
+    weights = torch.linspace(0.0, 1.0, steps)
+    for weight in weights:
+        blended = blend_signed_distance_fields(
+            volume_a, volume_b, float(weight), mode=mode, smoothness=smoothness
+        )
+        yield float(weight), blended
+
+
+def extract_isosurface_mesh(
+    volume: torch.Tensor,
+    axis: torch.Tensor,
+    level: float = 0.0,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Run marching cubes on a volume and return world-space vertices and faces."""
+
+    volume_np = volume.detach().cpu().numpy()
+    verts, faces, _, _ = measure.marching_cubes(volume_np, level=level)
+
+    axis_np = axis.detach().cpu().numpy()
+    idx_coords = np.arange(volume.shape[0], dtype=np.float32)
+    verts_world = np.stack(
+        [
+            np.interp(verts[:, 2], idx_coords, axis_np),
+            np.interp(verts[:, 1], idx_coords, axis_np),
+            np.interp(verts[:, 0], idx_coords, axis_np),
+        ],
+        axis=1,
+    ).astype(np.float32)
+
+    return verts_world, faces.astype(np.int32)

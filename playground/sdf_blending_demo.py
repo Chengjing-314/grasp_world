@@ -1,19 +1,25 @@
 """Mesh blending demo rendered in Viser."""
 
+import argparse
+import time
 from pathlib import Path
 from typing import Dict, Tuple
-import torch
-from kaolin.io import obj
 
-import argparse
 import numpy as np
 import viser
 
 from grasp_world.utils.sdf import (
-    extract_isosurface_mesh,
-    generate_blend_sequence,
-    sample_mesh_sdfs_on_axis,
     compute_common_axis,
+    extract_isosurface_mesh,
+    sample_mesh_sdfs_on_axis,
+    sequence_refine_by_change,
+    multipath_blend,
+    target_volume_for_t,
+    find_isolevel_for_target_volume,
+    redistance_pde,
+    xi_uniform,
+    xi_plane,
+    xi_radial,
 )
 
 MESH_DIR = Path("assets/objects/primitive_shapes")
@@ -60,85 +66,61 @@ def _quat_from_direction(
     return (np.cos(half), axis[0] * sin_half, axis[1] * sin_half, axis[2] * sin_half)
 
 
-def visualize_blends(
-    src_mesh: Path,
-    tgt_mesh: Path,
-    resolution: int = 96,
-    steps: int = 5,
-    device: str = "auto",
-    blend_mode: str = "lsb",
-    smoothness: float = 4.0,
-) -> None:
+def visualize_schedules(src_mesh, tgt_mesh, resolution=64, steps=6, device="auto"):
     axis = compute_common_axis([src_mesh, tgt_mesh], resolution)
-    volumes = sample_mesh_sdfs_on_axis({"src": src_mesh, "tgt": tgt_mesh}, axis, device=device)
-    blend_sequence = list(
-        generate_blend_sequence(
-            volumes["src"],
-            volumes["tgt"],
-            steps,
-            mode=blend_mode,
-            smoothness=smoothness,
-        )
-    )
+    vols = sample_mesh_sdfs_on_axis({"A": src_mesh, "B": tgt_mesh}, axis, device=device)
+    A, B = vols["A"], vols["B"]
+
+    schedules = {
+        "uniform": xi_uniform(A.shape, 0.5, device=A.device),
+        "plane_x": xi_plane(A.shape, "x", device=A.device),
+        "radial": xi_radial(axis.to(A.device), outward=True),
+    }
 
     server = viser.ViserServer()
     server.scene.world_axes.visible = True
-    server.scene.add_grid("/ground", width=4.0, height=4.0, cell_size=0.25)
-
-    # Basic lighting rig.
-    server.scene.add_light_directional(
-        "/lights/key",
-        color=(1.0, 0.95, 0.9),
-        intensity=3.0,
-        cast_shadow=True,
-        wxyz=_quat_from_direction((0.5, -1.0, -0.8)),
-    )
-    server.scene.add_light_directional(
-        "/lights/fill",
-        color=(0.6, 0.7, 1.0),
-        intensity=1.2,
-        wxyz=_quat_from_direction((-0.6, -1.0, -0.2)),
-    )
-    server.scene.add_light_ambient("/lights/ambient", intensity=0.3)
 
     span = axis[-1] - axis[0]
-    offset_step = span * 1.4 if span > 0 else 1.0
+    offset_x = span * 1.4
+    offset_y = span * 1.4
 
-    for idx, (weight, volume) in enumerate(blend_sequence):
-        verts, faces = extract_isosurface_mesh(volume, axis)
-        name = f"/blend/step_{idx:02d}"
-        color = _lerp_color(weight)
-        position = (offset_step * (idx - (len(blend_sequence) - 1) / 2.0), 0.0, 0.0)
-
-        server.scene.add_mesh_simple(
-            name,
-            vertices=verts,
-            faces=faces,
-            color=color,
-            position=position,
-            flat_shading=True,
-            side="double",
-            cast_shadow=True,
-            receive_shadow=True,
+    for row, (name, xi) in enumerate(schedules.items()):
+        t_list = sequence_refine_by_change(
+            A, B, xi, w=0.3, gate="smoother", t_list=[0.0, 0.5, 1.0], max_frames=20, tol=4e-3
         )
+        for col, t in enumerate(t_list):
+            phi = multipath_blend(A, B, t, xi, w=0.3, gate="smoother")
+            Vt = target_volume_for_t(A, B, xi, t, w=0.3, gate="smoother")
+            iso = find_isolevel_for_target_volume(phi, Vt)
+            verts, faces = extract_isosurface_mesh(phi, axis, level=iso, init_res=resolution)
+            position = (offset_x * (col - (steps - 1) / 2), row * offset_y, 0.0)
+            server.scene.add_mesh_simple(
+                f"/{name}/step_{col}",
+                vertices=verts,
+                faces=faces,
+                color=_lerp_color(t),
+                position=position,
+                flat_shading=True,
+                side="double",
+            )
+            server.scene.add_label(
+                f"/{name}/label_{col}",
+                text=f"{name}, t={t:.2f}",
+                position=(position[0], position[1], axis[-1] + 0.2),
+            )
 
-        server.scene.add_label(
-            f"{name}_label",
-            text=f"w = {weight:.2f}",
-            position=(position[0], 0.0, axis[-1] + 0.2),
-        )
-
-    print("Viser server running at http://localhost:8080 — press Ctrl+C to stop.")
+    # Keep the visualization server alive so the viewer stays connected.
     try:
-        server.sleep_forever()
+        while True:
+            time.sleep(1.0)
     except KeyboardInterrupt:
-        server.stop()
+        pass
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Visualize SDF blends in Viser.")
     parser.add_argument("--resolution", type=int, default=96, help="Grid resolution per axis.")
-    parser.add_argument("--steps", type=int, default=5, help="Number of blend steps to show.")
+    parser.add_argument("--steps", type=int, default=10, help="Number of blend steps to show.")
     parser.add_argument(
         "--device",
         type=str,
@@ -160,12 +142,10 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    visualize_blends(
+    visualize_schedules(
         MESHES["sphere"],
         MESHES["torus"],
         resolution=args.resolution,
         steps=args.steps,
         device=args.device,
-        blend_mode=args.mode,
-        smoothness=args.smoothness,
     )

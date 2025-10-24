@@ -1,0 +1,673 @@
+<robot name="shadowhand">
+  <joint name="FFJ1" type="revolute">
+    <origin xyz="0. -0. 0.025" rpy="0. 0. 0." />
+    <parent link="ffmiddle" />
+    <child link="ffdistal" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.5709999" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="FFJ2" type="revolute">
+    <origin xyz="0. -0. 0.045" rpy="0. 0. 0." />
+    <parent link="ffproximal" />
+    <child link="ffmiddle" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.5709999" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="FFJ3" type="revolute">
+    <origin xyz="0. -0. 0." rpy="0. 0. -1.5707961" />
+    <parent link="ffknuckle" />
+    <child link="ffproximal" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.5709999" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="FFJ4" type="revolute">
+    <origin xyz="0.033 -0. 0.095" rpy="-0. 0. 1.5707961" />
+    <parent link="palm" />
+    <child link="ffknuckle" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="-0.349" upper="0.349" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="LFJ1" type="revolute">
+    <origin xyz="0. -0. 0.025" rpy="0. 0. 0." />
+    <parent link="lfmiddle" />
+    <child link="lfdistal" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.5709999" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="LFJ2" type="revolute">
+    <origin xyz="0. -0. 0.045" rpy="0. 0. 0." />
+    <parent link="lfproximal" />
+    <child link="lfmiddle" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.5709999" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="LFJ3" type="revolute">
+    <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+    <parent link="lfknuckle" />
+    <child link="lfproximal" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.5709999" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="LFJ4" type="revolute">
+    <origin xyz="0.0264159 -0. 0.0390794" rpy="0.9631015 0.0000001 1.5707963" />
+    <parent link="lfmetacarpal" />
+    <child link="lfknuckle" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="-0.349" upper="0.349" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="LFJ5" type="revolute">
+    <origin xyz="-0.017 -0. 0.044" rpy="0. -0.9631015 -0.0000001" />
+    <parent link="palm" />
+    <child link="lfmetacarpal" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="0.785" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="MFJ1" type="revolute">
+    <origin xyz="0. -0. 0.025" rpy="0. 0. 0." />
+    <parent link="mfmiddle" />
+    <child link="mfdistal" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.5709999" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="MFJ2" type="revolute">
+    <origin xyz="0. -0. 0.045" rpy="0. 0. 0." />
+    <parent link="mfproximal" />
+    <child link="mfmiddle" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.5709999" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="MFJ3" type="revolute">
+    <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+    <parent link="mfknuckle" />
+    <child link="mfproximal" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.5709999" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="MFJ4" type="revolute">
+    <origin xyz="0.011 0. 0.099" rpy="-0. 0. 1.5707961" />
+    <parent link="palm" />
+    <child link="mfknuckle" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="-0.349" upper="0.349" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="RFJ1" type="revolute">
+    <origin xyz="0. -0. 0.025" rpy="0. 0. 0." />
+    <parent link="rfmiddle" />
+    <child link="rfdistal" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.5709999" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="RFJ2" type="revolute">
+    <origin xyz="0. -0. 0.045" rpy="0. 0. 0." />
+    <parent link="rfproximal" />
+    <child link="rfmiddle" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.5709999" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="RFJ3" type="revolute">
+    <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+    <parent link="rfknuckle" />
+    <child link="rfproximal" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.5709999" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="RFJ4" type="revolute">
+    <origin xyz="-0.011 -0. 0.095" rpy="-0. 0. 1.5707961" />
+    <parent link="palm" />
+    <child link="rfknuckle" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="-0.349" upper="0.349" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="THJ1" type="revolute">
+    <origin xyz="-0. -0. 0.032" rpy="0. 0. 0." />
+    <parent link="thmiddle" />
+    <child link="thdistal" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="-1.5709999" upper="0." effort="100" velocity="1.0" />
+  </joint>
+  <joint name="THJ2" type="revolute">
+    <origin xyz="0. 0. 0." rpy="-0. 0. 1.5707961" />
+    <parent link="thhub" />
+    <child link="thmiddle" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="-0.524" upper="0.524" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="THJ3" type="revolute">
+    <origin xyz="0. -0. 0.038" rpy="0. 0. 0." />
+    <parent link="thproximal" />
+    <child link="thhub" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="-0.209" upper="0.209" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="THJ4" type="revolute">
+    <origin xyz="-0. -0. 0." rpy="-0. -1.5707963 0. " />
+    <parent link="thbase" />
+    <child link="thproximal" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="0." upper="1.222" effort="100" velocity="1.0" />
+  </joint>
+  <joint name="THJ5" type="revolute">
+    <origin xyz="0.034 -0.009 0.029" rpy="3.1415925 0.7857963 3.1415925" />
+    <parent link="palm" />
+    <child link="thbase" />
+    <axis xyz="1. 0. 0." />
+    <limit lower="-1.047" upper="1.047" effort="100" velocity="1.0" />
+  </joint>
+  <link name="ffdistal">
+    <inertial>
+      <origin xyz="0. 0. 0.015" rpy="0. 0. 0." />
+      <mass value="0.01" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <collision>
+      <origin xyz="0. 0. 0.001" rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_ffdistal.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0. 0. 0.001" rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_ffdistal.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+  </link>
+  <link name="ffknuckle">
+    <inertial>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <mass value="0.008" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_ffknuckle.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_ffknuckle.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="ffmiddle">
+    <inertial>
+      <origin xyz="0. 0. 0.011" rpy="0. 0. 0." />
+      <mass value="0.012" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_ffmiddle.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_ffmiddle.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="ffproximal">
+    <inertial>
+      <origin xyz="0. 0. 0.023" rpy="0. 0. 0." />
+      <mass value="0.014" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_ffproximal.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_ffproximal.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="lfdistal">
+    <inertial>
+      <origin xyz="0. 0. 0.015" rpy="0. 0. 0." />
+      <mass value="0.01" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0.001" rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_lfdistal.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0.001" rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_lfdistal.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="lfknuckle">
+    <inertial>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <mass value="0.008" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+      <geometry>
+        <mesh filename="meshes/V_lfknuckle.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+      <geometry>
+        <mesh filename="meshes/V_lfknuckle.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="lfmetacarpal">
+    <inertial>
+      <origin xyz="-0.014 0.001 0.014" rpy="0. 0. 0." />
+      <mass value="0.075" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="-0.0280179 -0. 0.000003 " rpy="0.0000001 0.9631015 0.0000001" />
+      <geometry>
+        <mesh filename="meshes/V_lfmetacarpal.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="-0.0012114 -0. 0.0192557" rpy="0.0000001 0.9631015 0.0000001" />
+      <geometry>
+        <box size="0.019 0.0222 0.05 " />
+      </geometry>
+    </collision>
+  </link>
+  <link name="lfmiddle">
+    <inertial>
+      <origin xyz="0. 0. 0.012" rpy="0. 0. 0." />
+      <mass value="0.012" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_lfmiddle.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_lfmiddle.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="lfproximal">
+    <inertial>
+      <origin xyz="0. 0. 0.023" rpy="0. 0. 0." />
+      <mass value="0.014" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_lfproximal.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_lfproximal.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="mfdistal">
+    <inertial>
+      <origin xyz="0. 0. 0.015" rpy="0. 0. 0." />
+      <mass value="0.01" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_mfdistal.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_mfdistal.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="mfknuckle">
+    <inertial>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <mass value="0.008" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+      <geometry>
+        <mesh filename="meshes/V_mfknuckle.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+      <geometry>
+        <mesh filename="meshes/V_mfknuckle.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="mfmiddle">
+    <inertial>
+      <origin xyz="0. 0. 0.012" rpy="0. 0. 0." />
+      <mass value="0.012" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_mfmiddle.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_mfmiddle.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="mfproximal">
+    <inertial>
+      <origin xyz="0. 0. 0.023" rpy="0. 0. 0." />
+      <mass value="0.014" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_mfproximal.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_mfproximal.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="palm">
+    <inertial>
+      <origin xyz="0.006 0. 0.036" rpy="0. 0. 0." />
+      <mass value="0.3" />
+      <inertia ixx="0.001" ixy="0." ixz="0." iyy="0.001" iyz="0." izz="0.001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_palm.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0.011 0. 0.038" rpy="0. 0. 0." />
+      <geometry>
+        <box size="0.064 0.0222 0.098 " />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="-0.032 0. 0.014" rpy="0. 0. 0." />
+      <geometry>
+        <box size="0.022 0.0222 0.05 " />
+      </geometry>
+    </collision>
+  </link>
+  <link name="rfdistal">
+    <inertial>
+      <origin xyz="0. 0. 0.015" rpy="0. 0. 0." />
+      <mass value="0.01" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0.001" rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_rfdistal.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0.001" rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_rfdistal.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="rfknuckle">
+    <inertial>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <mass value="0.008" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+      <geometry>
+        <mesh filename="meshes/V_rfknuckle.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+      <geometry>
+        <mesh filename="meshes/V_rfknuckle.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="rfmiddle">
+    <inertial>
+      <origin xyz="0. 0. 0.012" rpy="0. 0. 0." />
+      <mass value="0.012" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_rfmiddle.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_rfmiddle.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="rfproximal">
+    <inertial>
+      <origin xyz="0. 0. 0.023" rpy="0. 0. 0." />
+      <mass value="0.014" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_rfproximal.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_rfproximal.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="thbase">
+    <inertial>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <mass value="0.01" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="-0. -0. 0." rpy="-0. -1.5707963 0. " />
+      <geometry>
+        <box size="0.002 0.002 0.002" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="-0. -0. 0." rpy="-0. -1.5707963 0. " />
+      <geometry>
+        <box size="0.002 0.002 0.002" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="thdistal">
+    <inertial>
+      <origin xyz="0. 0. 0.016" rpy="0. 0. 0." />
+      <mass value="0.016" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+      <geometry>
+        <mesh filename="meshes/V_thdistal.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+      <geometry>
+        <mesh filename="meshes/V_thdistal.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="thhub">
+    <inertial>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <mass value="0.002" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <box size="0.002 0.002 0.002" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <box size="0.002 0.002 0.002" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="thmiddle">
+    <inertial>
+      <origin xyz="0. 0. 0.016" rpy="0. 0. 0." />
+      <mass value="0.016" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+      <geometry>
+        <mesh filename="meshes/V_thmiddle.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. -1.5707961" />
+      <geometry>
+        <mesh filename="meshes/V_thmiddle.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="thproximal">
+    <inertial>
+      <origin xyz="0. 0. 0.017" rpy="0. 0. 0." />
+      <mass value="0.016" />
+      <inertia ixx="0.00001" ixy="0." ixz="0." iyy="0.00001" iyz="0." izz="0.00001" />
+    </inertial>
+    <visual>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_thproximal.obj" scale="1. 1. 1." />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <geometry>
+        <mesh filename="meshes/V_thproximal.obj" scale="1. 1. 1." />
+      </geometry>
+    </collision>
+  </link>
+  <link name="shadow_root_link_0">
+    <inertial>
+      <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+      <mass value="0.0" />
+      <inertia ixx="0.00" ixy="0.00" ixz="0.00" iyy="0.00" iyz="0.00" izz="0.00" />
+    </inertial>
+  </link>
+  <link name="shadow_root_link_1">
+    <inertial>
+      <mass value="0.00" />
+      <inertia ixx="0.00" ixy="0.00" ixz="0.00" iyy="0.00" iyz="0.00" izz="0.00" />
+    </inertial>
+  </link>
+  <link name="shadow_root_link_2">
+    <inertial>
+      <mass value="0.00" />
+      <inertia ixx="0.00" ixy="0.00" ixz="0.00" iyy="0.00" iyz="0.00" izz="0.00" />
+    </inertial>
+  </link>
+  <link name="shadow_root_link_3">
+    <inertial>
+      <mass value="0.00" />
+      <inertia ixx="0.00" ixy="0.00" ixz="0.00" iyy="0.00" iyz="0.00" izz="0.00" />
+    </inertial>
+  </link>
+  <link name="shadow_root_link_4">
+    <inertial>
+      <mass value="0.00" />
+      <inertia ixx="0.00" ixy="0.00" ixz="0.00" iyy="0.00" iyz="0.00" izz="0.00" />
+    </inertial>
+  </link>
+  <link name="shadow_root_link_5">
+    <inertial>
+      <mass value="0.00" />
+      <inertia ixx="0.00" ixy="0.00" ixz="0.00" iyy="0.00" iyz="0.00" izz="0.00" />
+    </inertial>
+  </link>
+  <joint name="root_x_axis_joint" type="prismatic">
+    <parent link="shadow_root_link_0" />
+    <child link="shadow_root_link_1" />
+    <axis xyz="1 0 0" />
+    <limit effort="2.0" lower="-1.0" upper="1.0" velocity="2.0" />
+  </joint>
+  <joint name="root_y_axis_joint" type="prismatic">
+    <parent link="shadow_root_link_1" />
+    <child link="shadow_root_link_2" />
+    <axis xyz="0 1 0" />
+    <limit effort="2.0" lower="-1.0" upper="1.0" velocity="2.0" />
+  </joint>
+  <joint name="root_z_axis_joint" type="prismatic">
+    <parent link="shadow_root_link_2" />
+    <child link="shadow_root_link_3" />
+    <axis xyz="0 0 1" />
+    <limit effort="2.0" lower="-1.0" upper="1.0" velocity="2.0" />
+  </joint>
+  <joint name="root_x_rot_joint" type="revolute">
+    <parent link="shadow_root_link_3" />
+    <child link="shadow_root_link_4" />
+    <axis xyz="1 0 0" />
+    <limit effort="2.0" lower="-3.14" upper="3.14" velocity="2.0" />
+  </joint>
+  <joint name="root_y_rot_joint" type="revolute">
+    <parent link="shadow_root_link_4" />
+    <child link="shadow_root_link_5" />
+    <axis xyz="0 1 0" />
+    <limit effort="2.0" lower="-3.14" upper="3.14" velocity="2.0" />
+  </joint>
+  <joint name="root_z_rot_joint" type="revolute">
+    <parent link="shadow_root_link_5" />
+    <child link="palm" />
+    <axis xyz="0 0 1" />
+    <origin rpy="-0.00000 -0.00000 0" xyz="0 0 0" />
+    <limit effort="2.0" lower="-3.14" upper="3.14" velocity="2.0" />
+  </joint>
+</robot>
